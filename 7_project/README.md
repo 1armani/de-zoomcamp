@@ -59,7 +59,7 @@ The Data Warehouse is defined with dbt. It creates a table with all the info in 
 
 dbt is also used for creating the transformations needed for the visualizations. A view is created in a staging phase containing only the _PushEvents_ (a Push Event contains one or more commits), and a final table containing the commit count per user is materialized in the deployment phase.
 
-The visualization dashboard is one page Looker Studio report with 2 widgets.
+The visualization dashboard is a Google Looker Studio report with 2 widgets.
 
 # Reproduce the project
 
@@ -349,19 +349,19 @@ You may now trigger the job manually or you may wait until the scheduled trigger
 
 ## Creating a dashboard
 
-The dashboard used in this project was generated with [Google Data Studio](https://datastudio.google.com/) (GDS from now on). Dashboards in GDS are called _reports_. Reports grab data from _data sources_. We will need to generate 2 data sources and a report:
+The dashboard used in this project was generated with [Google Looker Studio](https://lookerstudio.google.com/) (GLS from now on). Dashboards in GLS are called _reports_. Reports grab data from _data sources_. We will need to generate 2 data sources and a report:
 
 1. Generate the data sources.
     1. Click on the _Create_ button and choose _Data source_.
     1. Click on the _BigQuery_ connector.
     1. Choose your Google Cloud project, choose your _production core_ dataset and click on the `users` table. Click on the _Connect_ button at the top.
     1. You may rename the data source by clicking on the name at the top left of the screen. The default name will be the name of the chosen table.
-    1. Click on the GDS icon on the top left to go back to the GDS front page and repeat all of the previous steps but choose the _production staging_ dataset and the `stg_commits` table.
+    1. Click on the GLS icon on the top left to go back to the GLS front page and repeat all of the previous steps but choose the _production staging_ dataset and the `stg_commits` table.
 1. Generate the report.
     1. Click on the _Create_ button and choose _Report_.
     1. If the _Add data to report_ pop-up appears, choose the `My data sources` tab and choose one of the data sources. Click on the _Add to report_ button on the confirmation pop-up.
     1. Once you're in the report page, click on the _Add data_ button on the top bar and choose the other data source you created.
-    1.  You may delete any default widgets created by GDS.
+    1.  You may delete any default widgets created by GLS.
 1. Add the _Top Github Contributors_ widget.
     1. Click on the _Add a chart_ button on the top bar and select _Table_.
     1. On the left bar, in _Data source_ choose the dats source with the `users` table.
