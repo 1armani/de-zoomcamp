@@ -37,7 +37,7 @@ This folder contains my project for the [Data Engineering Zoomcamp](https://gith
 
 # Problem
 
-This is a simple project which takes data from the GitHub Archive and transforms it in order to visualize the top GitHub contributors as well as the amount of commits per day.
+This is a data engineering project which takes data from the GitHub Archive and transforms it in order to visualize the top GitHub contributors as well as the distribution of commits between various organizations.
 
 # Dataset
 
@@ -59,7 +59,7 @@ The Data Warehouse is defined with dbt. It creates a table with all the info in 
 
 dbt is also used for creating the transformations needed for the visualizations. A view is created in a staging phase containing only the _PushEvents_ (a Push Event contains one or more commits), and a final table containing the commit count per user is materialized in the deployment phase.
 
-The visualization dashboard is a simple Looker Studio report with 2 widgets.
+The visualization dashboard is one page Looker Studio report with 2 widgets.
 
 # Reproduce the project
 
@@ -368,7 +368,7 @@ The dashboard used in this project was generated with [Google Data Studio](https
     1. In _Dimension_, choose `actor_login` as the only dimension.
     1. In _Metric_, choose `commit_count` as the only metric.
     1. In _Sort_, choose `commit_count` and click on _Descending_.
-1. Add the _Commits per day_ widget.
+1. Add the _Distribution of the commits by organization_ widget.
     1. Click on the _Add a chart_ button on the top bar and select _Pie chart diagramm_.
     1. On the left bar, in _Data source_ choose the dats source with the `stg_commits_agg` table.
     1. In _Dimension_, choose `org_login` as the only dimension.
