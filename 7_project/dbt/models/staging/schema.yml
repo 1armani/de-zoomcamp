@@ -10,3 +10,6 @@ models:
   - name: stg_commits
     description: >
       GitHub commits
+  - name: stg_commits_agg
+    description: >
+      GitHub commits aggregated
