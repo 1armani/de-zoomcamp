@@ -299,8 +299,9 @@ You should now have a bucket called `data_lake` and a dataset called `gh-archive
     docker-compose up
     ```
 
-You may now access the Airflow GUI by browsing to `localhost:8080`. Username and password are both `airflow` .
+You may now access the Airflow GUI by browsing to `localhost:8080`. Username and password are both `airflow` . For accessing web browser on remote VM you might want to use port forwarding using VSCode extention. Detailed instruction was in the video [1.4.2 - Port Mapping and Networks in Docker (Bonus)](https://www.youtube.com/watch?v=tOr4hTsHOzU&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=14&ab_channel=DataTalksClub%E2%AC%9B)
 >***IMPORTANT***: this is ***NOT*** a production-ready setup! The username and password for Airflow have not been modified in any way; you can find them by searching for `_AIRFLOW_WWW_USER_USERNAME` and `_AIRFLOW_WWW_USER_PASSWORD` inside the `docker-compose.yaml` file.
+
 
 ## Perform the data ingestion
 
