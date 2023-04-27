@@ -1,4 +1,4 @@
-_[Back to the repo index](https://github.com/ziritrion/dataeng-zoomcamp)_
+_[Back to the repo index](https://github.com/1armani/de-zoomcamp)_
 
 # Data Engineering Zoomcamp Project
 
@@ -37,7 +37,7 @@ This folder contains my project for the [Data Engineering Zoomcamp](https://gith
 
 # Problem
 
-This is a simple project which takes data from the GitHub Archive and transforms it in order to visualize the top GitHub contributors as well as the amount of commits per day.
+This is a data engineering project which takes data from the GitHub Archive and transforms it in order to visualize the top GitHub contributors as well as the distribution of commits between various organizations.
 
 # Dataset
 
@@ -45,7 +45,7 @@ The chosen dataset for this project is the [GitHub Archive](https://www.gharchiv
 
 # Dashboard
 
-You may access the dashboard with the visualizations [in this link](https://datastudio.google.com/reporting/fe0713dd-c5f1-4e26-b8e1-ca2a64cec745).
+You may access the dashboard with the visualizations [in this link](https://lookerstudio.google.com/reporting/378eb555-233d-462b-b337-3cd2eee8c409).
 
 # Project details and implementation
 
@@ -59,7 +59,7 @@ The Data Warehouse is defined with dbt. It creates a table with all the info in 
 
 dbt is also used for creating the transformations needed for the visualizations. A view is created in a staging phase containing only the _PushEvents_ (a Push Event contains one or more commits), and a final table containing the commit count per user is materialized in the deployment phase.
 
-The visualization dashboard is a simple Google Data Studio report with 2 widgets.
+The visualization dashboard is a Google Looker Studio report with 2 widgets.
 
 # Reproduce the project
 
@@ -94,7 +94,7 @@ You will also need to activate the following APIs:
 * https://console.cloud.google.com/apis/library/iam.googleapis.com
 * https://console.cloud.google.com/apis/library/iamcredentials.googleapis.com
 
-If all of these steps are unfamiliar to you, please review [Lesson 1.3.1 - Introduction to Terraform Concepts & GCP Pre-Requisites (YouTube)](https://youtu.be/Hajwnmj0xfQ?t=198), or check out my notes [here](https://github.com/ziritrion/dataeng-zoomcamp/blob/main/notes/1_intro.md#gcp-initial-setup).
+If all of these steps are unfamiliar to you, please review [Lesson 1.3.1 - Introduction to Terraform Concepts & GCP Pre-Requisites (YouTube)](https://youtu.be/Hajwnmj0xfQ?t=198).
 
 ## Creating an environment variable for the credentials
 
@@ -191,10 +191,11 @@ gcloud compute instances create <name-of-the-vm> --zone=<google-cloud-zone> --im
     1. Run `sudo gpasswd -a $USER docker`
     1. Log out of your SSH session and log back in.
     1. Run `sudo service docker restart`
+    1. Relogin to the server to apply changes
     1. Test that Docker can run successfully with `docker run hello-world`
 ### Docker compose:
 1. Go to https://github.com/docker/compose/releases and copy the URL for the  `docker-compose-linux-x86_64` binary for its latest version.
-    * At the time of writing, the last available version is `v2.2.3` and the URL for it is https://github.com/docker/compose/releases/download/v2.2.3/docker-compose-linux-x86_64
+    * At the time of writing, the last available version is `v2.17.3` and the URL for it is https://github.com/docker/compose/releases/download/v2.17.3/docker-compose-linux-x86_64
 1. Create a folder for binary files for your Linux user:
     1. Create a subfolder `bin` in your home account with `mkdir ~/bin`
     1. Go to the folder with `cd ~/bin`
@@ -246,10 +247,10 @@ Make sure that you upload the `google_credentials.json` to `$HOME/.google/creden
 Log in to your VM instance and run the following from your `$HOME` folder:
 
 ```sh
-git clone https://github.com/ziritrion/dataeng-zoomcamp.git
+git clone https://github.com/1armani/de-zoomcamp.git
 ```
 
-The contents of the project can be found in the `dataeng-zoomcamp/7_project` folder.
+The contents of the project can be found in the `de-zoomcamp/7_project` folder.
 
 >***IMPORTANT***: I strongly suggest that you fork my project and clone your copy so that you can easily perform changes on the code, because you will need to customize a few variables in order to make it run with your own infrastructure.
 
@@ -257,7 +258,7 @@ The contents of the project can be found in the `dataeng-zoomcamp/7_project` fol
 
 Make sure that the credentials are updated and the environment variable is set up.
 
-1. Go to the `dataeng-zoomcamp/7_project/terraform` folder.
+1. Go to the `de-zoomcamp/7_project/terraform` folder.
 
 1. Open `variables.tf` and edit line 11 under the `variable "region"` block so that it matches your preferred region.
 
@@ -278,7 +279,7 @@ You should now have a bucket called `data_lake` and a dataset called `gh-archive
 
 ## Set up data ingestion with Airflow
 
-1. Go to the `dataeng-zoomcamp/7_project/airflow` folder.
+1. Go to the `de-zoomcamp/7_project/airflow` folder.
 1. Run the following command and write down the output:
     ```sh
     echo -e "AIRFLOW_UID=$(id -u)"
@@ -298,14 +299,15 @@ You should now have a bucket called `data_lake` and a dataset called `gh-archive
     docker-compose up
     ```
 
-You may now access the Airflow GUI by browsing to `localhost:8080`. Username and password are both `airflow` .
+You may now access the Airflow GUI by browsing to `localhost:8080`. Username and password are both `airflow` . For accessing web browser on remote VM you might want to use port forwarding using VSCode extention. Detailed instruction was in the video [1.4.2 - Port Mapping and Networks in Docker (Bonus)](https://www.youtube.com/watch?v=tOr4hTsHOzU&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=14&ab_channel=DataTalksClub%E2%AC%9B)
 >***IMPORTANT***: this is ***NOT*** a production-ready setup! The username and password for Airflow have not been modified in any way; you can find them by searching for `_AIRFLOW_WWW_USER_USERNAME` and `_AIRFLOW_WWW_USER_PASSWORD` inside the `docker-compose.yaml` file.
+
 
 ## Perform the data ingestion
 
 If you performed all the steps of the previous section, you should now have a web browser with the Airflow dashboard.
 
-The DAG is set up to download all data starting from April 1st 2022. You may change this date by modifying line 202 of `dataeng-zoomcamp/7_project/airflow/dags/data_ingestion.py` . It is not recommended to retrieve data earlier than January 1st 2015, because the data was retrieved with a different API and it has not been tested to work with this pipeline. Should you change the DAG date, you will have to delete the DAG in the Airflow UI and wait a couple of minutes so that Airflow can pick up the changes in the DAG.
+The DAG is set up to download all data starting from April 1st 2023. You may change this date by modifying line 202 of `de-zoomcamp/7_project/airflow/dags/data_ingestion.py` . It is not recommended to retrieve data earlier than January 1st 2015, because the data was retrieved with a different API and it has not been tested to work with this pipeline. Should you change the DAG date, you will have to delete the DAG in the Airflow UI and wait a couple of minutes so that Airflow can pick up the changes in the DAG.
 
 To trigger the DAG, simply click on the switch icon next to the DAG name. The DAG will retrieve all data from the starting date to the latest available hour and then perform hourly checks on every 30 minute mark.
 
@@ -348,31 +350,32 @@ You may now trigger the job manually or you may wait until the scheduled trigger
 
 ## Creating a dashboard
 
-The dashboard used in this project was generated with [Google Data Studio](https://datastudio.google.com/) (GDS from now on). Dashboards in GDS are called _reports_. Reports grab data from _data sources_. We will need to generate 2 data sources and a report:
+The dashboard used in this project was generated with [Google Looker Studio](https://lookerstudio.google.com/) (GLS from now on). Dashboards in GLS are called _reports_. Reports grab data from _data sources_. We will need to generate 2 data sources and a report:
 
 1. Generate the data sources.
     1. Click on the _Create_ button and choose _Data source_.
     1. Click on the _BigQuery_ connector.
     1. Choose your Google Cloud project, choose your _production core_ dataset and click on the `users` table. Click on the _Connect_ button at the top.
     1. You may rename the data source by clicking on the name at the top left of the screen. The default name will be the name of the chosen table.
-    1. Click on the GDS icon on the top left to go back to the GDS front page and repeat all of the previous steps but choose the _production staging_ dataset and the `stg_commits` table.
+    1. Click on the GLS icon on the top left to go back to the GLS front page and repeat all of the previous steps but choose the _production staging_ dataset and the `stg_commits` table.
 1. Generate the report.
     1. Click on the _Create_ button and choose _Report_.
     1. If the _Add data to report_ pop-up appears, choose the `My data sources` tab and choose one of the data sources. Click on the _Add to report_ button on the confirmation pop-up.
     1. Once you're in the report page, click on the _Add data_ button on the top bar and choose the other data source you created.
-    1.  You may delete any default widgets created by GDS.
+    1.  You may delete any default widgets created by GLS.
 1. Add the _Top Github Contributors_ widget.
     1. Click on the _Add a chart_ button on the top bar and select _Table_.
     1. On the left bar, in _Data source_ choose the dats source with the `users` table.
     1. In _Dimension_, choose `actor_login` as the only dimension.
     1. In _Metric_, choose `commit_count` as the only metric.
     1. In _Sort_, choose `commit_count` and click on _Descending_.
-1. Add the _Commits per day_ widget.
-    1. Click on the _Add a chart_ button on the top bar and select _Time series chart_.
-    1. On the left bar, in _Data source_ choose the dats source with the `stg_commits` table.
-    1. In _Dimension_, choose `created_at` as the only dimension.
-    1. In _Metric_, choose `Record Count` as the only metric.
+1. Add the _Distribution of the commits by organization_ widget.
+    1. Click on the _Add a chart_ button on the top bar and select _Pie chart diagramm_.
+    1. On the left bar, in _Data source_ choose the dats source with the `stg_commits_agg` table.
+    1. In _Dimension_, choose `org_login` as the only dimension.
+    1. In _Metric_, choose `Cnt` field as the only metric.
+    1. In _Sort_, choose `Cnt` and click on _Descending_.
 
 You should now have a functioning dashboard.
 
-_[Back to the repo index](https://github.com/ziritrion/dataeng-zoomcamp)_
+_[Back to the repo index](https://github.com/1armani/de-zoomcamp.git)_
