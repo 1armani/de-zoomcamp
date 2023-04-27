@@ -1,0 +1,36 @@
+
+
+	import sys
+
+	print(sys.argv) # prints all the input variables for the py script
+
+	day = sys.argv[1]  # lets the 1st arg is the date
+
+	print(f'the day = f{day}')
+
+
+	python
+	import pandas #should work!
+	pandas.__version__
+
+- read the PARQUET FILE from jupyter notebook
+	import pandas as pd
+	import pyarrow.parquet as pq
+	trips = pq.read_table('yellow_tripdata_2023-01.parquet')
+	print(trips)
+	trips = trips.to_pandas()
+	print(trips)
+
+
+# convert jupiter to py script:
+	jupyter nbconvert --to=script upload-data.ipynb
+
+# solution:
+	cd /Users/arman/Library/Jupyter
+	ln -s /System/Volumes/Data/opt/homebrew/share/jupyter/nbconvert
+
+
+# run http server
+python3 -m http.server
+ 
+ and then go to http://[::]:8000/ 

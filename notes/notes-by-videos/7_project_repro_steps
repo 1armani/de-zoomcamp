@@ -1,0 +1,146 @@
+de-zoomcamp
+this file containes short notes for reproducing the final project
+
+
+create the project in GCP:
+	de-project-384902
+enble API for engine
+
+
+create VM
+
+add ssh-key to the project
+
+add service account
+adding the roles 
+manage keys
+
+sudo apt-get update
+sudo apt-get install docker.io		
+
+scp files to this server (7_project) (or git clone from repo)
+
+connect remotely to VM via VScode
+
+edit docker-compose.yaml
+
++ edit docker.yaml
+edit docker-compose.yaml
+
+copy key to the VM
+	scp ~/.google/credentials/de-project-384902-0bb3bbb2465e.json de-project://home/arman
+
+mkdir on VM for creds
+~/.google/credentials/de-project-384902-0bb3bbb2465e.json
+
+export GOOGLE_APPLICATION_CREDENTIALS="/home/arman/.google/credentials/de-project-384902-0bb3bbb2465e.json"
+
+check if we can connect to the GCP:
+	gcloud auth application-default login
+
+edit env:
+	vim ~/.bashrc
+	export GOOGLE_APPLICATION_CREDENTIALS="<path/to/authkeys>.json"
+	source ~/.bashrc
+
+test docker:
+	sudo apt install docker.io
+
+	sudo groupadd docker
+	sudo gpasswd -a $USER docker
+	sudo service docker restart
+	# relogin to the server
+
+	docker run hello-world
+
+
+install docker-compose
+	sudo apt-get install docker-compose
+
+Install terraform:
+
+	curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+	sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+	sudo apt-get update && sudo apt-get install terraform
+
+
+go to terraform folder
+
+specify the project id in variables.tf so it don't ask me everytime:
+GCP_PROJECT_ID: 'de-project-384902'
+
+terraform init
+terraform plan
+
+go to bucket console GCP:
+	bucket_id = data_lake_de-project-384902
+   
+
+airflow!!!
+	echo -e "AIRFLOW_UID=$(id -u)"
+
+specify Project_ID and BUKCET_ID in .env file
+	GCP_PROJECT_ID: 'de-project-384902'
+	bucket_id = data_lake_de-project-384902
+
+install  docker-compose by dowloading
+run docker:
+	docker-compose build
+	docker-compose up airflow-init
+	docker-compose up
+
+rename de-project-384902-0bb3bbb2465e.json to credantials.json 
+
+localhost:8080
+run DAG 
+
+
+
+dbt
+create an account in the cloud
+create a project
+	gh-archive
+specify the folder for the files in the repo:
+	7_project/dbt/
+add .json file to access bigQuery
+specify location!!! (later needed to identify dataset) need to be the same as dataset in BQ (europe-west)
+connect with GitHub account to save the code
+test the connection
+
+
+replaced the files in the repo with tested from VM
+	airflow folder
+	dbt folder
+		also replaced parameters location for ext table gs://data_lake_de-project-384902/raw/*
+		alse replaced database name with mine: de-project-384902
+
+
+
+dbt create an environment
+dbt create job
+run job
+
+de-project-384902.gh_archive_all.gh_external_table
+gs://data_lake_de-project-384902/raw/*
+
+
+
+	08:12:58    404 Not found: Dataset de-project-384902:ghdataset_dwh was not found in location europe-west1
+	de-project-384902.gh_archive_all.gh_external_table
+
+	solution:
+		 In DBT cloud you can actually specify the location using the following steps:
+			Go to your profile page (top right drop-down --> profile)
+			Then go to under Credentials --> Analytics (you may have customised this name)
+			Click on Bigquery >
+			Hit Edit
+			Update your location, you may need to re-upload your service account JSON to re-fetch your private key, and save. (NOTE: be sure to exactly copy the region BigQuery specifies your dataset is in.)
+
+
+
+Data Looker Studio
+		https://lookerstudio.google.com/datasources/create/
+	create new project - Big Query
+
+
+

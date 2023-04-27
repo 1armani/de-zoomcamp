@@ -1,0 +1,21 @@
+1.4.2 - Port Mapping and Networks in Docker (Bonus)
+https://www.youtube.com/watch?v=tOr4hTsHOzU&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=14&ab_channel=DataTalksClub%E2%AC%9B
+
+ignore the folders for Docker:
+	create .dockerignore file in this directory and put the names of the folders to ignore in this file
+
+
++ explanation of the network.
+	
+	Lest docker-compose 2 containers we developed previously:
+
+		Host port 5431
+			container 1 (Postgres) port 5432 (mapped to port 5431 of host)
+			container 2 (Pgadmin) port 8080 (mapped to 8080 of host)
+
+
+	if we now run another container ingest_data:v001 within the same docker network
+	we need to connect diractly to the container 1 on port 5432 (inside the network) NOT the host port
+
+
+You may now access the Airflow GUI by browsing to localhost:8080

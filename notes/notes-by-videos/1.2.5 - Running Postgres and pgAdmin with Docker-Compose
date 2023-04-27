@@ -1,0 +1,18 @@
+https://www.youtube.com/watch?v=hKI6PkPhpa0&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=9&ab_channel=DataTalksClub%E2%AC%9B
+
+
+docker compose - utility to put confing into one file (yaml)
+
+
+when we specify they are already in the same network!!!
+
+
+#create dockers from docker-compose.yaml file
+docker-compose up 
+
+docker-compose down 
+
+# run in detached mode (we can use the terminal after start)
+docker-compose up -d 
+
+

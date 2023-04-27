@@ -1,0 +1,73 @@
+2.3.1 - Setup Airflow Environment with Docker-Compose
+https://www.youtube.com/watch?v=lqDMzReAtrw&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&ab_channel=DataTalksClub%E2%AC%9B
+https://github.com/DataTalksClub/data-engineering-zoomcamp/blob/main/cohorts/2022/week_2_data_ingestion/airflow/2_setup_nofrills.md
+
+https://github.com/1armani/data-engineering-zoomcamp/blob/main/notes/2_data_ingestion.md
+
+Setup ariflow
+
+	create a folder with Google auth file:
+
+		 cd ~ && mkdir -p ~/.google/credentials/
+		 mv <path/to/your/service-account-authkeys>.json ~/.google/credentials/google_credentials.json
+
+	create folders for airflow:
+		mkdir -p ./dags ./logs ./plugins
+		echo 'AIRFLOW_UID=50000' >> .env
+
+		# on not MacOS systems we need to run:
+		echo -e "AIRFLOW_UID=$(id -u)" >> .env
+
+	download yaml file for airflow docker compose:
+		curl -LfO 'https://airflow.apache.org/docs/apache-airflow/2.5.3/docker-compose.yaml'
+
+	Basic image of airflow doesn't know how to integrate with GCP (OAuth). So we need to edit the image
+		we use this docker file:
+		https://github.com/1armani/data-engineering-zoomcamp/blob/main/2_data_ingestion/airflow/Dockerfile
+
+		the ref for GCP:
+		https://airflow.apache.org/docs/docker-stack/recipes.html
+
+		download GCP ready dockerfile:
+			https://github.com/1armani/data-engineering-zoomcamp/blob/main/2_data_ingestion/airflow/Dockerfile
+		add requirenments.txt file to install py libraries we need in the project:
+			https://github.com/1armani/data-engineering-zoomcamp/blob/main/2_data_ingestion/airflow/requirements.txt
+
+		set the following parameter to false in yaml file:
+			AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+
+		provide envs:
+		    GOOGLE_APPLICATION_CREDENTIALS: /.google/credentials/google_credentials.json
+		    AIRFLOW_CONN_GOOGLE_CLOUD_DEFAULT: 'google-cloud-platform://?extra__google_cloud_platform__key_path=/.google/credentials/google_credentials.json'
+		    GCP_PROJECT_ID: 'dtc-de-383805'
+		    GCP_GCS_BUCKET: 'dtc_data_lake_dtc-de-383805'
+
+		error:
+			Airflow:Docker-Compose:"You are running pip as root Please use user to run pip:
+				https://stackoverflow.com/questions/72102582/airflowdocker-composeyou-are-running-pip-as-root-please-use-user-to-run-pip
+			changed the dockerfile:
+				added the string before installing requirements.txt:
+					USER ${AIRFLOW_UID}
+				and added the following before SHELL (downloading):
+					USER root
+
+		now we are ready to build the image of the service specified in docker-compose.yaml file:
+			docker-compose build
+
+		now we run init service to make sure everything is ok:
+			docker-compose up airflow-init
+
+		if prev command exited with 0 then it's OK and we run the whole docker-compose:
+			docker-compose up
+
+		check the status:
+			docker-compose ps
+
+		and go to the web adress of the airflow to check everything was installed (log: airflow/airflow):
+			0.0.0.0:8080
+
+
+here is the video to set up the lighter versioin of airflow:
+	https://www.youtube.com/watch?v=A1p5LQ0zzaQ&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=24&ab_channel=DataTalksClub%E2%AC%9B
+
+	

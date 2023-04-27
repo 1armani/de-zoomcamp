@@ -1,0 +1,73 @@
+https://www.youtube.com/watch?v=B1WwATwf-vY&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=9&ab_channel=DataTalksClub%E2%AC%9B
+https://github.com/ziritrion/dataeng-zoomcamp/blob/main/notes/1_intro.md#exporting-and-testing-the-script
+
+# convert jupiter to py script:
+	jupyter nbconvert --to=script upload-data.ipynb
+
+
+#error path incorrect:
+
+	 File "/opt/homebrew/lib/python3.11/site-packages/nbconvert/exporters/templateexporter.py", line 645, in get_template_names
+	    raise ValueError(
+	ValueError: No template sub-directory with name 'script' found in the following paths:
+		/Users/arman/Library/Jupyter
+		/Users/arman/Library/Python/3.11/share/jupyter
+		/opt/homebrew/opt/python@3.11/Frameworks/Python.framework/Versions/3.11/share/jupyter
+		/usr/local/share/jupyter
+		/usr/share/jupyter
+
+# solution:
+	cd /Users/arman/Library/Jupyter
+	ln -s /System/Volumes/Data/opt/homebrew/share/jupyter/nbconvert
+
+
+#the python file is: ./ingest_data.py
+
+	python3 ingest_data.py \
+	    --user=root \
+	    --password=root \
+	    --host=localhost \
+	    --port=5432 \
+	    --db=ny_taxi \
+	    --table_name=yellow_taxi_data \
+	    --url=${URL}
+
+# now let's dokerize this pipline (ingest script)
+	edit dockerfile to add some extra libraries needed for the py script
+	and rename the py script we used.
+
+# build the docker image
+	docker build -t taxi_ingest:v001 .
+
+# execute the docker
+
+URL="https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2023-01.parquet"
+
+docker run -it --network=pg-network \
+taxi_ingest:v001 \
+    --user=root \
+    --password=root \
+    --host=pg-database \
+    --port=5432 \
+    --db=ny_taxi \
+    --table_name=yellow_taxi_data \
+    --url=${URL}
+
+
+# lets replace the file so we don't have to download it everytime
+
+# run http server
+python3 -m http.server
+ 
+ and then go to http://[::]:8000/ 
+
+# find out ip of the host  
+ifconfig
+http://127.0.0.1:8000/
+
+#save the link to the file:
+http://127.0.0.1:8000/yellow_tripdata_2023-01.parquet
+
+URL=http://127.0.0.1:8000/yellow_tripdata_2023-01.parquet
+URL=http://127.0.0.1:8000/yellow_tripdata_2023-01.parquet
+  

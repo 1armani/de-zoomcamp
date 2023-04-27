@@ -1,0 +1,63 @@
+2.3.2 - Ingesting Data to GCP with Airflow
+https://www.youtube.com/watch?v=9ksX9REfL8w&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=20&ab_channel=DataTalksClub%E2%AC%9B
+
+https://github.com/1armani/data-engineering-zoomcamp/blob/main/notes/2_data_ingestion.md#creating-a-dag
+	
+	create python.py file in the dag directory
+	explain what is what in the python file.
+
+    trouble with the parquet file: 
+        1) (the csv link was not valid)
+        2) the curl didn't want to replace the file - returned error
+        3) the curl didn't work (didn't download the file) -> replace with wget
+        4) added wget in the installation of the image 
+
+        Data set:
+
+        	https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2021-01.csv
+
+            curl -sSL https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz
+            curl https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz > yellow_tripdata_2021-01.csv.gz
+
+            wget https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz
+
+
+            wget https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz -O yellow_tripdata_2021-01.csv.gz
+
+            wget -q https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz -O yellow_tripdata_2021-01.csv.gz
+
+
+            https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
+
+
+    troubles with creation of Ext table in Big Query
+
+        it creates CSV instead of Parquet - so the schema is incorrect.
+        read the docs but. the root cause in the logs of airflow:
+            it pointed at the row of the library (stack trace error)
+            I've found that parameters for the funciton CreateExtTab in this library are different:
+            https://github.com/apache/airflow/blob/main/airflow/providers/google/cloud/operators/bigquery.py
+
+        finally the problem is in the change of the names of parameters (added underscores):
+            source_format
+            source_uris
+
+        final code is:
+
+            table_resource={
+                "tableReference": {
+                    "projectId": PROJECT_ID,
+                    "datasetId": BIGQUERY_DATASET,
+                    "tableId": "external_table",
+                },
+                "externalDataConfiguration": {
+                    "source_format": "PARQUET",
+                    "source_uris": [f"gs://{BUCKET}/raw/{parquet_file}"],
+                    "autodetect": True,
+                },
+            },
+
+
+
+
+

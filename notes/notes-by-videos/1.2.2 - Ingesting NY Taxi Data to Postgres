@@ -1,0 +1,106 @@
+https://www.youtube.com/watch?v=2JM-ziJt0WI&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=5&t=28s&ab_channel=DataTalksClub%E2%AC%9B
+
+	Create postgres within Docker:
+
+	https://youtu.be/2JM-ziJt0WI
+			Docker compose - way of running multiple images
+
+			URL="https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2023-01.parquet"
+		
+		- got script from the airflow repo (it uses postgres internally)
+			it runs the image with the postgres and custom configs:
+
+			docker run -it \
+			    -e POSTGRES_USER="root" \
+			    -e POSTGRES_PASSWORD="root" \
+			    -e POSTGRES_DB="ny_taxi" \
+			    -v $(pwd)/ny_taxi_postgres_data:/var/lib/postgresql/data \
+			    -p 5432:5432 \
+			    postgres:13
+
+
+			<-e> = for specifieng env variables
+			<-v> = for mounting local host folders to the docker image/container
+
+		- connect with pgcli to our database
+			- install pgcli (https://www.pgcli.com/install)
+				brew install pgcli
+
+				pgcli --help
+
+				pgcli -h localhost -p 5432 -U root -d ny_taxi 	#successful connection!
+
+
+			- install pip and update pip
+				python3 -m ensurepip    
+				python3.11 -m pip install --upgrade pip
+
+			- install and launch jupyter
+				pip install jupyter
+
+				jupyter notebook
+
+			- connect with psql!!! success
+
+			- install pandas
+				pip3 install pandas
+
+
+		- download Yellow Taxi data
+			https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
+			https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2023-01.parquet
+
+		- read what is PARQUET and why not CSV like in video
+
+		- install pyarrow
+			pip3 install pyarrow
+
+		- read the PARQUET FILE from jupyter notebook
+			import pandas as pd
+			import pyarrow.parquet as pq
+			trips = pq.read_table('yellow_tripdata_2023-01.parquet')
+			print(trips)
+			trips = trips.to_pandas()
+			print(trips)
+
+
+1/04/23
+
+		- gerenate ddl create table in jupyter
+
+			print(pd.io.sql.get_schema(trips, name='yellow_taxi_data'))
+
+		- using sqlalchemy to upload data to postgres
+			pip install sqlachemy
+
+			import sqlalchemy
+			engine = create_engine('postgresql://root:root@localhost:5432/ny_taxi')
+
+			import psycopg2
+
+		- not working => install lib psycopg2 
+
+			# pip install psycopg2  #didnt help
+			brew install postgresql@15    
+			echo 'export PATH="/opt/homebrew/opt/postgresql@15/bin:$PATH"' >> ~/.zshrc
+
+			pip install psycopg2  
+
+			#create_engine working!!
+
+		- modify jupyter script (specify con in params)
+
+			engine = create_engine('postgresql://root:root@localhost:5432/ny_taxi')
+			engine.connect()
+
+			print(pd.io.sql.get_schema(trips, name='yellow_taxi_data', con=engine))
+
+		- google way to inter over parquet file
+
+			parquet_file = pq.ParquetFile('yellow_tripdata_2023-01.parquet')
+
+			for batch in parquet_file.iter_batches():
+			    print("RecordBatch")
+			    batch_df = batch.to_pandas()
+			    print("batch_df:", batch_df)
+

@@ -1,0 +1,192 @@
+1.4.1 - Setting up the Environment on Google Cloud (Cloud VM + SSH access)
+
+https://www.youtube.com/watch?v=ae-CV2KfoN0&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&ab_channel=DataTalksClub%E2%AC%9B
+
+generate ssh key to access Google cloud VM:
+	https://cloud.google.com/compute/docs/connect/create-ssh-keys
+	on local host:
+		ssh-keygen -t rsa -f ~/.ssh/gcp -C arman -b 2048
+		cat ~/.ssh/gcp.pub 
+	we put ssh key to Google cloud:
+		go to Compute Engine-> Metadata-> Add ssh key (paste cat of pub key)
+
+
+Create new VM in GCP:
+	VM instances 
+	select region and pricing
+	increase resourses (8CPU cores and 16GB memory)
+	change OS type -> Ubuntu 20.04
+	copy external ip adress
+	connect via ssh from local machine:
+		ssh -i ~/.ssh/gcp arman@35.79.9.1
+		 	#~/.ssh/gcp - my private key
+
+Now we want Python (here we use anaconda as a tool to get Python)
+	Download Anaconda for linux 
+		wget https://repo.anaconda.com/archive/Anaconda3-2023.03-Linux-x86_64.sh
+	run downloaded sh file:
+		bash Anaconda3-2023.03-Linux-x86_64.sh
+	init (type yes) or manually:
+		source anaconda3/bin/acitvate
+		conda init
+	now we see (base) added to the command terminal (meaning anaconda is active)
+
+Configure ssh connection without specifiyng ssh private key:
+	create config file in ~/.ssh/ dir:
+		touch config
+
+			Host de-zoomcamp
+				HostName 35.79.9.1
+				User arman
+				IdentityFile ~/.ssh/gcp
+
+	and now we can login to the machine without specifing the key and ip address by name:
+		ssh de-zoomcamp
+
+
+Now we need to install Docker:
+	update the list of packages:
+		sudo apt-get update
+		sudo apt-get install docker.io
+
+
+How to open any file on the remote ssh server through VSCode:
+	install remote ssh extention
+	Now we have green button in the left down corner (open in remote window -> open remote host -> select )
+	to toggle the window with terminal use CTRL + ~
+
+Clone githug repo to the VM:
+	git clone https://github.com/DataTalksClub/data-engineering-zoomcamp.git	
+
+
+Try to run docker hello-world:
+	run the command:
+		docker run hello-world
+	it fails due the lack of permissions. Now we need to google how to run it without sudo:
+		sudo groupadd docker
+		sudo usermod -aG docker $USER
+		sudo service docker restart
+		# relogin to server
+
+	now we can run docker:
+		docker run hello-world
+		docker run -it ubuntu bash
+
+Install docker-compose (via downloading):
+	go to google (download docker compose) -> GitHub -> Releases -> find download list. Get the one 
+	then create dir for executable files:
+		mkdir bin
+		cd bin
+	Download the file and rename output using -O flag:
+		wget https://github.com/docker/compose/releases/download/v2.17.3/docker-compose-linux-x86_64 -O docker-compose
+	make it executable by:
+		chmod +x docker-compose
+		./docker-compose version
+	make it visible from any directory:
+		vim ~/.bashrc
+	add at the end:
+		export PATH="${HOME}/bin:${PATH}"
+		source ~/.bashrc
+		which docker-compose
+
+Now we go to the dir of zoomcamp to test docker-compose on existing docker-compose.yaml file:
+	go to dir:
+		cd /home/arman/data-engineering-zoomcamp/week_1_basics_n_setup/2_docker_sql
+		docker-compose up -d 
+
+Now install PGCLI:
+	pip install pgcli
+Connect:
+	pgcli -h localhost -U root -d ny_taxi 
+
+Now just for the learning purposes: uninstall pgcli and use conda to install it again:
+	uninstall and install via command line:
+		pip uninstall pgcli
+		conda install -c conda-forge pgcli
+	launch pgcli again:
+		pgcli -h localhost -U root -d ny_taxi 
+	Here we get error messages. To get rid of them we need to install:
+		pip install -U mycli
+
+Go to VSCode and open the zoomcamp dir in the window. Now we can work with remote files as local.
+
+Now we learn how to forward ports of Postgres so we can interact with it from local host
+	GO to VSCode -> toggle CTRL + ~ . 
+	Go to tab PORTS
+	press Forward port and type in 5432
+	Now we can access remote Postgers on local machine:
+		psql -h localhost -d ny_taxi -U root
+
+	we can forward other ports (8080). and open in the browser PgAdmin!!!
+	http://localhost:8080
+
+
+How to execute Jupyter on VM:
+	Go the the folder with .ipynb file
+		cd data-zoom/week_1../2_docker../
+		jupyter notebook
+	Now we need to forward another port to open Jupyter
+		forward port 8888 in VSCode
+	Now open Jupyter in local browser. Copy link from remote server:
+		http://localhost:8889/token=.........
+	Select and open ipynb file (ingest data)
+	Download the dataset (NY taxi) on VM and decompress it:
+		wget https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz
+		gzip -d yellow_tripdata_2021-01.csv.gz
+
+	Now run notebook -> error. no psycopg2 package installed. Install it:
+		pip install psycopg2
+		sudo apt-get install gcc
+
+	execute insert in jupyter and check if we have it in postgres:
+		select count(1) from yellow_taxi..
+
+Terraform:
+	Now we learn how to download and install Terraform (manually, not by apt-get):
+		Go to google. find download page. choose amd64:
+			wget https://releases.hashicorp.com/terraform/1.4.5/terraform_1.4.5_linux_amd64.zip
+			apt install unzip
+			unzip terraform_1.4.5_linux_amd64.zip
+		It is already executable, and we already added bin forlder to PATH, so terraform can be executed:
+			terraform version
+	Now lets check if it is working:
+		cd datazoomcamp/week_1../1_terraform
+	Now we need to copy .json file with Google account credentials (was in download dir):
+	lets copy it to ~/.gc folder first:
+		mkdir ~/.gc
+		cd ~/.gc
+		copy ~/Downloads/dtc-de-383805-dee46ac6d6b4.json .
+	Lets use sftp for copying this file from local host to VM:
+		sftp de-zoomcamp
+		mkdir .gc
+		cd .gc
+		put dtc-de-383805-dee46ac6d6b4.json
+	Set env to auth to Google cloud without browser!:
+		export GOOGLE_APPLICATION_CREDENTIALS=~/.gc/dtc-de-383805-dee46ac6d6b4.json
+	Now authentificate:
+		gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS
+	Now we want to execute terraform:
+		cd dataengzoomcap/week_1/1_terraform/terraform/
+		terraform init
+		terraform plan 
+	Here we need to specify the project id. (dtc-de-383805)
+	If we don't want to specify ProjectID everytime we can put it in the variable.tf file (in the same folder)
+
+		variable "project" {
+		  description = "Your GCP Project ID"
+		  default = "dtc-de-383805"
+		  type = string
+		} 
+
+	Apply terraform plan:
+		terraform apply
+
+Turn off and on the VM:
+	Shutdown VM form terminal:
+		sudo shutdown now
+	Now we restart the VM from Google console (three dots -> Start)
+	Now we need to refresh external ip in the local confing (./ssh/config)
+		vim ~/.ssh/config
+	Connect again to VM
+		ssh de-zoomcamp
+

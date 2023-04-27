@@ -1,0 +1,6 @@
+- install pgcli (https://www.pgcli.com/install)
+	brew install pgcli
+
+	pgcli --help
+
+	pgcli -h localhost -p 5432 -U root -d ny_taxi 	#successful connection!	

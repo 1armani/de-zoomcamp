@@ -1,0 +1,123 @@
+full playlist of the course is here:
+https://www.youtube.com/playlist?list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb
+
+Watch video of lection #1.2.1
+https://www.youtube.com/watch?v=EYNwNlOrpr0&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=4&t=1s&ab_channel=DataTalksClub%E2%AC%9B
+
+
+	- Docker
+
+Prepare my Mac for the project
+	- install homebrew
+	- install iTerm2
+	- install Docker
+		configure Docker
+		complete tutorial Docker (create an tutorial image)
+	- install VSCode
+
+
+
+30/03/23
+	- create Python virtual environment (tool to copy settings and env to reproduce smth)
+		- pipenv - one of the way to do Python virt env
+			- but there is no way to use pipenv on Mac M1
+			- so we need to do workaround -> Ubuntu VM
+		- Multipass - way to do Ubuntu VM using CLI (VirtualBox is slow and bloated)
+
+		- install pipenv on Ubuntu
+
+
+31/03/23
+	- configure terminal on Mac
+		https://apple.stackexchange.com/questions/33677/how-can-i-configure-mac-terminal-to-have-color-ls-output
+	- install Python
+		- install PyEnv (to switch btw diff versions of python)
+		- install Python 3.11.2
+		- install git
+
+
+	Create DOCKER and pipeline within Docker:
+
+		review the video:
+		https://www.youtube.com/watch?v=2JM-ziJt0WI&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=5
+
+		instructions and notes:
+		https://github.com/ziritrion/dataeng-zoomcamp/blob/main/notes/1_intro.md
+		
+		- run container from "hello-world" image:
+			docker run -it hello-image #<-it>=interactive mode, <hello-image>=name of the image in the repo
+			
+			- do come stupid stuff there: rm rf 
+			- rerun container from image(it is new and not affected)
+		- create python container from python container
+			`docker run -it python:3.9`
+
+			- connect with bash to Python container :
+				`docker run -it --entrypoint=bash python:3.9`
+
+			- install pandas in container Python
+				- pip install pandas
+
+		- creat a new image!!
+			-  in VSCOde dockerfile:
+
+				FROM python:3.9  #specifies image name from which to create
+
+				RUN pip install pandas #installs panda
+
+				ENTRYPOINT [ "bash" ]  #overrides entry point
+
+			- build image (within the folder with Dockerfile):
+				`docker build -t test:pandas . `  #<-t>=tag; <test>=name of image; <.> current dir 
+
+			- run the image:
+				docker run -it test:pandas
+
+				- check if pandas already installed:
+					python
+					import pandas #should work!
+					pandas.__version__
+
+		- create a Pipeline
+			- create a new file pipeline.py in VSCode
+				import pandas as pd
+
+				# some fancy stuff with pandas 
+
+				print('job finished successfully')
+
+			- add some instructions in Dockerfile:
+
+				WORKDIR /app   # this line creates dir /app in Ubuntu and the cd to it
+				COPY pipeline.py pipeline.py #this copies the file to this directory
+
+			- rebuild the image and run the image:
+				docker build -t test:pandas .
+				docker run -it test:pandas
+
+				- now you can see the the dir created. 
+				- run the pipeline:
+					python pipeline.py
+
+
+		- make pipeline more interesting:
+			- modify the pipeline.py
+				import sys
+
+				print(sys.argv) # prints all the input variables for the py script
+
+				day = sys.argv[1]  # lets the 1st arg is the date
+
+				print(f'the day = f{day}')
+
+			- modife Dockerfile! to automatically run the pipeline:
+				ENTRYPOINT = ['python','pipeline.py']
+
+			- rebuild and run the container with the ARGUMent!
+				docker build -t test:pandas .
+				docker run -it test:pandas 2023-03-26  #<2023-03-26> is an argument to pass it inside for .py script
+
+
+
+
+	

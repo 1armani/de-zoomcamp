@@ -1,0 +1,15 @@
+https://github.com/DataTalksClub/data-engineering-zoomcamp/tree/main/cohorts/2022/week_2_data_ingestion
+
+2.2.1 - Introduction to Workflow Orchestration
+https://www.youtube.com/watch?v=0yK7LXwYeD0&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&ab_channel=DataTalksClub%E2%AC%9B
+
+
+
+We need to split the operations of downloading and uploading
+	- because of issues with the inernet
+	- add retry mechanism 
+
+
+DAG is a data pipeline or Data Flow
+
+jobs and dependencies without cycles.
