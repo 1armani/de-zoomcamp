@@ -45,7 +45,9 @@ The chosen dataset for this project is the [GitHub Archive](https://www.gharchiv
 
 # Dashboard
 
-You may access the dashboard with the visualizations [in this link](https://lookerstudio.google.com/reporting/378eb555-233d-462b-b337-3cd2eee8c409).
+You may access the dashboard with the visualizations [in this link](https://lookerstudio.google.com/reporting/378eb555-233d-462b-b337-3cd2eee8c409). 
+Here is the screenshot of the dashboard:
+![dashboard](images/looker_studio_report.png)
 
 # Project details and implementation
 
